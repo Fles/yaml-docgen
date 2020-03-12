@@ -2,10 +2,10 @@
   "name": "yaml-docgen",
   "version": "0.0.1",
   "description": "YAML comments to documentation markdown",
-  "main": "./bin/index.js",
   "preferGlobal": true,
+  "main": "./dist/bin/index.js",
   "bin": {
-    "yaml-docgen": "./bin/index.js"
+    "yaml-docgen": "./dist/bin/index.js"
   },
   "author": "Fles <the.final.frontend@gmail.com>",
   "license": "SEE LICENSE IN LICENSE",
@@ -34,11 +34,16 @@
     "automatization"
   ],
   "scripts": {
-    "build": "tsc",
-    "watch": "tsc --w"
+    "build": "rm -rf ./dist/ && tsc",
+    "compile": "ts-node ./lib/index.ts ./test/test.yaml ./test/test.md",
+    "test:watch": "nodemon -e ts,yaml --exec \"npm run compile\""
+  },
+  "dependencies": {
+    "commander": "^4.1.0"
   },
   "devDependencies": {
     "@types/node": "^13.9.0",
+    "nodemon": "^2.0.2",
     "prettier": "1.19.1"
   }
 }
