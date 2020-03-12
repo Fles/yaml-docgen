@@ -34,9 +34,11 @@
     "automatization"
   ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc",
+    "watch": "tsc --w"
   },
   "devDependencies": {
+    "@types/node": "^13.9.0",
     "prettier": "1.19.1"
   }
 }
