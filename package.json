@@ -34,6 +34,7 @@
     "automatization"
   ],
   "scripts": {
+    "install:global": "npm run build && npm pack && npm i -g yaml-docgen-0.0.1.tgz",
     "build": "rm -rf ./dist/ && tsc",
     "compile": "ts-node ./lib/index.ts ./test/test.yaml ./test/test.md",
     "test:watch": "nodemon -e ts,yaml --exec \"npm run compile\""

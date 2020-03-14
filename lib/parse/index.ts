@@ -1,56 +1,40 @@
 #! /usr/bin/env node
+import * as fs from 'fs'
+import * as path from 'path'
+import * as util from 'util'
+import { exec as child_process_exec } from 'child_process'
+import { DocBlock, DocBlockTarget } from './types'
+const exec = util.promisify(child_process_exec)
 
-const fs = require('fs')
-const { exec } = require('child_process')
+/**
+ * **Extract DocBlock's from raw data**
+ * @param {string} data - source
+ * @param {DocBlockTarget.start} start - start of block
+ * @param {DocBlockTarget.end} end - end of block (last character of next line)
+ * @returns {DocBlock[]} list of DocBlocks
+ */
+const extractDocBlocks = (
+  data: string,
+  start: DocBlockTarget['start'],
+  end: DocBlockTarget['end']
+): DocBlock[] =>
+  data
+    .match(new RegExp(`(?=${start})(.*?)(?=${end})`, 'gs'))
+    .map(db => db.split('\n'))
+    .map(db => ({
+      payload: db[0].substring(4),
+      reference: db[1].replace(/^\s+|\s+$/g, ''),
+      type: db[0].charAt(1),
+    })) as DocBlock[]
 
-const makeMD = (I, O) => {
-  const rawData = fs.readFileSync(I, 'utf8')
-  const blockMatches = rawData.match(/(?<=###)(.*?)(?=\:)/gs)
-  const blocks = blockMatches.map(bm => {
-    const [comment, reference] = bm.split('\n')
-    const kind = bm.split('\n')[0].split(' ')[0]
-    return [kind, reference, comment]
-  })
+const parse = (I: string, O: string): void => {
+  const data = fs.readFileSync(path.resolve(I), 'utf-8')
+  const docs = extractDocBlocks(data, '#(#|!|\\?)#', '(: |:\n)')
 
-  let markdown = ''
-
-  blocks.forEach((block, idx) => {
-    const [kind, reference, comment] = block
-    if (kind === '.') {
-      markdown += `\n\n###\`${reference.replace(
-        /^\s+|\s+$/g,
-        ''
-      )}\`\n\n> ${comment.replace(/!|\?|\.|\*/g, '')}\n\n`
-      if (blocks[idx + 1][0] !== '.') {
-        markdown +=
-          '\n| Name | Description | Options | Default | Required |\n| :--- | :--- | :---: | :---: | :---:|\n'
-      }
-    }
-    if (kind === '?' || kind === '!') {
-      const name = '`' + reference.replace(/^\s+|\s+$/g, '') + '`'
-      const description = comment
-        .replace(/!|\?|\.|\*/g, '')
-        .replace(/\[.*?\]/, '')
-      const options = comment.match(/(?<=\[)(.*?)(?=\])/gs) || ''
-      const req =
-        comment.substring(0, 1) === '!'
-          ? 'yes'
-          : comment.substring(0, 1) === '?'
-          ? 'no'
-          : ''
-      const defVal = comment.match(/(?<=\*\*)(.*?)(?=\*\*)/gs) || ''
-      markdown += `| ${name} | ${description} | ${options} | ${defVal} | ${req} |\n`
-    }
-  })
-  fs.writeFileSync(O, markdown)
-  exec(`npx prettier --write ${O}`, (err, stdout, stderr) => {
-    if (err) {
-      console.log(`✘ yaml2md: error occurred!`)
-      console.error(err)
-    } else {
-      console.log(`✔ yaml2md: documentation generated!`)
-    }
-  })
+  console.log(docs)
 }
 
-module.exports = ({ I, O }) => makeMD(I, O)
+/*
+ * EXPORT
+ */
+module.exports = ({ I, O }) => parse(I, O)
