@@ -2,6 +2,7 @@ export type DocBlockTarget = {
   start: '#(#|!|\\?)#'
   end: '(: |:\n)'
 }
+
 export type DocBlockType = '!' | '?' | '#'
 
 export type DocBlock = {
