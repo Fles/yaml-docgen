@@ -6,5 +6,5 @@
     "allowJs": true,
     "target": "ES6"
   },
-  "include": ["./lib/**/*"]
+  "include": ["./lib/**/*", "./bin/**/*"]
 }

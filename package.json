@@ -2,10 +2,10 @@
   "name": "yaml-docgen",
   "version": "0.0.1",
   "description": "YAML comments to documentation markdown",
-  "main": "./bin/index.js",
   "preferGlobal": true,
+  "main": "./dist/bin/index.js",
   "bin": {
-    "yaml-docgen": "./bin/index.js"
+    "yaml-docgen": "./dist/bin/index.js"
   },
   "author": "Fles <the.final.frontend@gmail.com>",
   "license": "SEE LICENSE IN LICENSE",
@@ -34,11 +34,27 @@
     "automatization"
   ],
   "scripts": {
-    "build": "tsc",
-    "watch": "tsc --w"
+    "install:global": "npm run build && npm pack && npm i -g yaml-docgen-0.0.1.tgz",
+    "build": "rm -rf ./dist/ && tsc",
+    "compile": "ts-node ./lib/index.ts ./test/test.yaml ./test/test.md",
+    "test": "jest"
+  },
+  "dependencies": {
+    "commander": "^4.1.0"
   },
   "devDependencies": {
+    "@types/jest": "^25.1.4",
     "@types/node": "^13.9.0",
-    "prettier": "1.19.1"
+    "husky": "^4.2.3",
+    "jest": "^25.1.0",
+    "nodemon": "^2.0.2",
+    "prettier": "1.19.1",
+    "ts-jest": "^25.2.1",
+    "typescript": "^3.8.3"
+  },
+  "husky": {
+    "hooks": {
+      "pre-push": "npm test"
+    }
   }
 }
